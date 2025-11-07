@@ -27,10 +27,7 @@ import numpy as np
 import pandas as pd
 
 from . import common
-from .sampler.chat_completion_sampler import (
-    OPENAI_SYSTEM_MESSAGE_API,
-    ChatCompletionSampler,
-)
+from .sampler.gemini_sampler import GeminiSampler
 from .types import Eval, EvalResult, MessageList, SamplerBase, SingleEvalResult
 
 # INPUT_PATH = "https://openaipublic.blob.core.windows.net/simple-evals/healthbench/2025-05-07-06-14-12_oss_eval.jsonl"
@@ -563,10 +560,10 @@ def physician_completions_main(
     now = datetime.now()
     date_str = now.strftime("%Y%m%d_%H%M")
 
-    grading_sampler = ChatCompletionSampler(
-        model="gpt-4.1-2025-04-14",
-        system_message=OPENAI_SYSTEM_MESSAGE_API,
-        max_tokens=2048,
+    grading_sampler = GeminiSampler(
+        model="gemini-1.5-pro",
+        max_output_tokens=2048,
+        temperature=0.2,
     )
     dummy_sampler = SamplerBase()
 
