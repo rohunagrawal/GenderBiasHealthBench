@@ -264,6 +264,7 @@ def main():
             args.examples if args.examples is not None else (5 if debug_mode else None)
         )
         # Set num_examples = None to reproduce full evals
+        print(eval_name)
         match eval_name:
             case "mmlu":
                 return MMLUEval(num_examples=1 if debug_mode else num_examples)
@@ -339,8 +340,9 @@ def main():
         for eval_name in evals_list:
             try:
                 evals[eval_name] = get_evals(eval_name, args.debug)
-            except Exception:
+            except Exception as e:
                 print(f"Error: eval '{eval_name}' not found.")
+                print(e)
                 return
     else:
         evals = {
