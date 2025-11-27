@@ -1,2 +1,5 @@
 google-generativeai
 tabulate
+pandas
+jinja2
+scipy
