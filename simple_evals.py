@@ -59,7 +59,7 @@ def main():
         "gemini-2.0-flash-lite": GeminiSampler(
             model="gemini-2.0-flash-lite",
             max_output_tokens=2048,
-            temperature=0.2,
+            temperature=0.0,
         ),
         
     }
@@ -83,7 +83,7 @@ def main():
     grading_sampler = GeminiSampler(
         model="gemini-2.0-flash-lite",
         max_output_tokens=2048,
-        temperature=0.2,
+        temperature=0.0,
     )
     equality_checker = GeminiSampler(
         model="gemini-2.0-flash-lite",

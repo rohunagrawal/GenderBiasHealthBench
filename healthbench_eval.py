@@ -2,9 +2,7 @@
 This script evaluates the performance of a model on the HealthBench dataset.
 
 To run HealthBench, HealthBench Consensus, or HealthBench Hard, use the simple-evals script:
-- `python -m simple-evals.simple_evals --eval=healthbench --model=gpt-4.1`
-- `python -m simple-evals.simple_evals --eval=healthbench_consensus --model=gpt-4.1`
-- `python -m simple-evals.simple_evals --eval=healthbench_hard --model=gpt-4.1`
+- `python -m simple_evals.simple_evals --eval=healthbench_hard --model=gemini-2.0-flash-lite --n-threads 1 --examples 20`
 
 You can also evaluate physician ideal completions or reference completions against the HealthBench rubrics. To do so, run the following command:
 - To evaluate physician ideal completions: `python -m simple-evals.healthbench_eval --run_mode=physician_completions`
@@ -36,7 +34,7 @@ from .types import Eval, EvalResult, MessageList, SamplerBase, SingleEvalResult
 
 
 INPUT_PATH = "/Users/rohunagrawal/Code/repos/simple_evals/healthbench/2025-05-07-06-14-12_oss_eval.jsonl"
-INPUT_PATH_HARD = "/Users/rohunagrawal/Code/repos/simple_evals/healthbench/hard_2025-05-08-21-00-10.jsonl"
+INPUT_PATH_HARD = "/Users/rohunagrawal/Code/repos/simple_evals/healthbench/hard_filtered.jsonl"
 INPUT_PATH_CONSENSUS = "/Users/rohunagrawal/Code/repos/simple_evals/healthbench/consensus_2025-05-09-20-00-46.jsonl"
 
 GRADER_TEMPLATE = """
