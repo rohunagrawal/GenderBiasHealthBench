@@ -3,7 +3,7 @@ GPQA: A Graduate-Level Google-Proof Q&A Benchmark
 David Rein, Betty Li Hou, Asa Cooper Stickland, Jackson Petty, Richard Yuanzhe Pang, Julien Dirani, Julian Michael, Samuel R. Bowman
 https://arxiv.org/abs/2311.12022
 """
-
+import math 
 import random
 import re
 
@@ -33,6 +33,7 @@ class GPQAEval(Eval):
         examples = [example | {"permutation": rng.sample(range(4), 4)} for example in examples]
         self.examples = examples
         self.n_repeats = n_repeats
+        #random comment 
 
     def __call__(self, sampler: SamplerBase) -> EvalResult:
         def fn(row: dict):
