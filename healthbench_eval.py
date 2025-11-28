@@ -410,14 +410,21 @@ class HealthBenchEval(Eval):
             pbar=False,
         )
 
-        rubric_items_for_scoring = list(rubric_items)
-        grading_responses_for_scoring = list(grading_response_list)
-        if extra_rubric_items or extra_grading_responses:
-            extra_rubric_items = extra_rubric_items or []
-            extra_grading_responses = extra_grading_responses or []
-            assert len(extra_rubric_items) == len(extra_grading_responses)
-            rubric_items_for_scoring.extend(extra_rubric_items)
-            grading_responses_for_scoring.extend(extra_grading_responses)
+        base_rubric_items = list(rubric_items)
+        base_grading_responses = list(grading_response_list)
+        extra_rubric_items = list(extra_rubric_items or [])
+        extra_grading_responses = list(extra_grading_responses or [])
+        if len(extra_rubric_items) != len(extra_grading_responses):
+            raise ValueError(
+                "extra_rubric_items and extra_grading_responses must have the same length"
+            )
+        rubric_items_for_scoring = base_rubric_items + extra_rubric_items
+        grading_responses_for_scoring = (
+            base_grading_responses + extra_grading_responses
+        )
+        rubric_sources = (
+            ["base"] * len(base_rubric_items) + ["extra"] * len(extra_rubric_items)
+        )
 
         # compute the overall score
         overall_score = calculate_score(
@@ -455,8 +462,11 @@ class HealthBenchEval(Eval):
         # construct the list of explanations and grades
         rubric_items_with_grades = []
         readable_explanation_list = []
-        for rubric_item, grading_response in zip(
-            rubric_items_for_scoring, grading_responses_for_scoring
+        for source, rubric_item, grading_response in zip(
+            rubric_sources,
+            rubric_items_for_scoring,
+            grading_responses_for_scoring,
+            strict=True,
         ):
             explanation = grading_response.get("explanation", "No explanation provided")
             criteria_met = grading_response["criteria_met"]
@@ -469,6 +479,7 @@ class HealthBenchEval(Eval):
                     **rubric_item.to_dict(),
                     "criteria_met": criteria_met,
                     "explanation": explanation,
+                    "source": source,
                 }
             )
 

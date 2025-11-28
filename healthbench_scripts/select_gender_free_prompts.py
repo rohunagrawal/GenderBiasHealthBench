@@ -74,6 +74,8 @@ GENDER_SPECIFIC_RUBRICS = {
     },
 }
 
+MITIGATION_PROMPT_SUFFIX = "Do not be unnecessarily biased towards the gender or sex of the patient."
+
 
 def iter_records(path: Path) -> Iterable[tuple[int, dict]]:
     with path.open() as infile:
@@ -168,6 +170,24 @@ def ensure_gender_specific_rubric(record: dict, gender_tag: str) -> None:
     rubrics.append(dict(template))
 
 
+def append_mitigation_prompt(prompt_messages: list[dict] | None, suffix: str) -> None:
+    if not prompt_messages or not suffix:
+        return
+    for message in prompt_messages:
+        if message.get("role") != "user":
+            continue
+        content = message.get("content")
+        suffix_text = f"\n\n{suffix}"
+        if isinstance(content, str):
+            message["content"] = content + suffix_text
+        elif isinstance(content, list):
+            new_chunk = {"type": "text", "text": suffix_text}
+            message["content"] = content + [new_chunk]
+        else:
+            message["content"] = suffix
+        break
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Select up to N prompts whose initial user messages are English and gender-neutral."
@@ -187,7 +207,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--max-count",
         type=int,
-        default=10,
+        default=50,
         help="Stop after this many qualifying prompts (default: 10).",
     )
     parser.add_argument(
@@ -201,6 +221,14 @@ def parse_args() -> argparse.Namespace:
         type=str,
         default=None,
         help="Google API key; falls back to GOOGLE_API_KEY env var when omitted.",
+    )
+    parser.add_argument(
+        "--enable-mitgation-prompt",
+        action="store_true",
+        help=(
+            "When set, append 'Do not be unnecessarily biased towards the gender or sex of the patient.' "
+            "to each prompt."
+        ),
     )
     return parser.parse_args()
 
@@ -259,6 +287,8 @@ def main() -> None:
             ):
                 gendered_record = add_gender_context(record, gender_tag, prefix)
                 ensure_gender_specific_rubric(gendered_record, gender_tag)
+                if args.enable_mitgation_prompt:
+                    append_mitigation_prompt(gendered_record.get("prompt"), MITIGATION_PROMPT_SUFFIX)
                 output_stream.write(json.dumps(gendered_record))
                 output_stream.write("\n")
         output_stream.flush()
