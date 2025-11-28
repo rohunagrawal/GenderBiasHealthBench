@@ -732,6 +732,7 @@ def physician_completions_main(
         model="gemini-1.5-pro",
         max_output_tokens=2048,
         temperature=0.2,
+        seed=42,
     )
     dummy_sampler = SamplerBase()
 

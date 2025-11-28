@@ -24,6 +24,7 @@ class GeminiSampler(SamplerBase):
         max_output_tokens: int = 2048,
         safety_settings: dict[str, Any] | None = None,
         api_key: str | None = None,
+        seed: int | None = None,
     ):
         api_key = api_key or os.environ.get("GOOGLE_API_KEY")
         if not api_key:
@@ -39,6 +40,7 @@ class GeminiSampler(SamplerBase):
         self.top_k = top_k
         self.max_output_tokens = max_output_tokens
         self.safety_settings = safety_settings
+        self.seed = seed
         self.model = genai.GenerativeModel(
             model_name=model, system_instruction=system_instruction
         )
@@ -112,6 +114,8 @@ class GeminiSampler(SamplerBase):
             "top_k": self.top_k,
             "max_output_tokens": self.max_output_tokens,
         }
+        if self.seed is not None:
+            generation_config["seed"] = self.seed
         trial = 0
         while True:
             try:

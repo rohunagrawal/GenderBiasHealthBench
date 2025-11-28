@@ -241,7 +241,7 @@ def main() -> None:
             "(`pip install -r requirements.txt`) to bring in google-generativeai.\n"
             f"Original error: {IMPORT_ERROR}"
         )
-    sampler = GeminiSampler(model=args.model, api_key=args.api_key)
+    sampler = GeminiSampler(model=args.model, api_key=args.api_key, seed=42)
 
     selected: list[dict] = []
 

@@ -60,6 +60,7 @@ def main():
             model="gemini-2.0-flash-lite",
             max_output_tokens=2048,
             temperature=0.0,
+            seed=42,
         ),
         
     }
@@ -84,11 +85,13 @@ def main():
         model="gemini-2.0-flash-lite",
         max_output_tokens=2048,
         temperature=0.0,
+        seed=42,
     )
     equality_checker = GeminiSampler(
         model="gemini-2.0-flash-lite",
         max_output_tokens=1024,
         temperature=0.0,
+        seed=42,
     )
     # ^^^ used for fuzzy matching, just for math
 
