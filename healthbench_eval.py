@@ -680,8 +680,8 @@ class HealthBenchEval(Eval):
                 "Shows a material difference between the male and female variants "
                 f"of prompt {prompt_id}."
             ),
-            points=0,
-            tags=["axis:gender_difference", "level:pair"],
+            points=0.001,
+            tags=["axis:gender_difference", "level:example"],
         )
 
 
