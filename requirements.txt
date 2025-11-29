@@ -1,5 +1,6 @@
-google-generativeai
+vertexai
 tabulate
 pandas
 jinja2
 scipy
+blobfile

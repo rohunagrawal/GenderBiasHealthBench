@@ -3,14 +3,15 @@ import os
 import time
 from typing import Any, Iterable
 
-import google.generativeai as genai
+import vertexai
+from vertexai.generative_models import GenerativeModel, Part
 
 from ..types import MessageList, SamplerBase, SamplerResponse
 
 
 class GeminiSampler(SamplerBase):
     """
-    Sample from Google's Gemini (and Gemma) models using the Generative AI API.
+    Sample from Google's Gemini (and Gemma) models using the Vertex AI SDK.
     """
 
     def __init__(
@@ -23,15 +24,17 @@ class GeminiSampler(SamplerBase):
         top_k: int = 32,
         max_output_tokens: int = 2048,
         safety_settings: dict[str, Any] | None = None,
-        api_key: str | None = None,
+        project_id: str | None = None,
+        location: str = "us-central1",
         seed: int | None = None,
     ):
-        api_key = api_key or os.environ.get("GOOGLE_API_KEY")
-        if not api_key:
+        project_id = project_id or os.environ.get("GOOGLE_CLOUD_PROJECT")
+        if not project_id:
             raise ValueError(
-                "GeminiSampler requires a Google API key. Pass api_key=... or set GOOGLE_API_KEY."
+                "GeminiSampler requires a Google Cloud project ID. Pass project_id=... or set GOOGLE_CLOUD_PROJECT."
             )
-        genai.configure(api_key=api_key)
+        
+        vertexai.init(project=project_id, location=location)
 
         self.model_name = model
         self.system_instruction = system_instruction
@@ -41,7 +44,7 @@ class GeminiSampler(SamplerBase):
         self.max_output_tokens = max_output_tokens
         self.safety_settings = safety_settings
         self.seed = seed
-        self.model = genai.GenerativeModel(
+        self.model = GenerativeModel(
             model_name=model, system_instruction=system_instruction
         )
 

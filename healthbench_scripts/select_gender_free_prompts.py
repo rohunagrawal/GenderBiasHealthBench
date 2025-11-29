@@ -216,12 +216,7 @@ def parse_args() -> argparse.Namespace:
         default="gemini-2.0-flash-lite",
         help="Gemini model name (default: gemini-2.0-flash-lite).",
     )
-    parser.add_argument(
-        "--api-key",
-        type=str,
-        default=None,
-        help="Google API key; falls back to GOOGLE_API_KEY env var when omitted.",
-    )
+
     parser.add_argument(
         "--enable-mitgation-prompt",
         action="store_true",
@@ -238,10 +233,10 @@ def main() -> None:
     if GeminiSampler is None:  # pragma: no cover - configuration issue
         raise SystemExit(
             "Unable to import GeminiSampler. Install the project dependencies "
-            "(`pip install -r requirements.txt`) to bring in google-generativeai.\n"
+            "(`pip install -r requirements.txt`) to bring in vertexai.\n"
             f"Original error: {IMPORT_ERROR}"
         )
-    sampler = GeminiSampler(model=args.model, api_key=args.api_key, seed=42)
+    sampler = GeminiSampler(model=args.model, seed=42)
 
     selected: list[dict] = []
 
