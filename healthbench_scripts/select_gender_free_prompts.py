@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Filter HealthBench prompts with Gemini so only English, gender-free user prompts remain.
+Filter HealthBench prompts with Qwen so only English, gender-free user prompts remain.
 """
 
 from __future__ import annotations
@@ -25,10 +25,10 @@ if str(REPO_PARENT) not in sys.path:
     sys.path.insert(0, str(REPO_PARENT))
 
 try:
-    from simple_evals.sampler.gemini_sampler import GeminiSampler
+    from simple_evals.sampler.qwen_sampler import QwenSampler
     from simple_evals.types import MessageList
 except ModuleNotFoundError as exc:  # pragma: no cover - configuration issue
-    GeminiSampler = None  # type: ignore[assignment]
+    QwenSampler = None  # type: ignore[assignment]
     MessageList = list  # type: ignore[assignment]
     IMPORT_ERROR = exc
 else:
@@ -99,7 +99,7 @@ def initial_user_prompt(prompt_messages: list[dict] | None) -> str | None:
     return None
 
 
-def classify_prompt(sampler: GeminiSampler, prompt_text: str) -> tuple[bool, str]:
+def classify_prompt(sampler: QwenSampler, prompt_text: str) -> tuple[bool, str]:
     full_prompt = (
         f"{CLASSIFIER_INSTRUCTIONS}\n\n"
         "Classify the following prompt:\n"
@@ -207,14 +207,14 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--max-count",
         type=int,
-        default=50,
+        default=10,
         help="Stop after this many qualifying prompts (default: 10).",
     )
     parser.add_argument(
         "--model",
         type=str,
-        default="gemini-2.0-flash-lite",
-        help="Gemini model name (default: gemini-2.0-flash-lite).",
+        default="Qwen/Qwen2.5-3B-Instruct",
+        help="Qwen model name (default: Qwen/Qwen2.5-3B-Instruct).",
     )
 
     parser.add_argument(
@@ -225,18 +225,26 @@ def parse_args() -> argparse.Namespace:
             "to each prompt."
         ),
     )
+    parser.add_argument(
+        "--disable-gender-variants",
+        action="store_true",
+        help=(
+            "When set, emit only the filtered prompt without generating male/female/neutral variants. "
+            "Default behavior keeps all variants."
+        ),
+    )
     return parser.parse_args()
 
 
 def main() -> None:
     args = parse_args()
-    if GeminiSampler is None:  # pragma: no cover - configuration issue
+    if QwenSampler is None:  # pragma: no cover - configuration issue
         raise SystemExit(
-            "Unable to import GeminiSampler. Install the project dependencies "
-            "(`pip install -r requirements.txt`) to bring in vertexai.\n"
+            "Unable to import QwenSampler. Install the project dependencies "
+            "(`pip install -r requirements.txt`) to bring in transformers and torch.\n"
             f"Original error: {IMPORT_ERROR}"
         )
-    sampler = GeminiSampler(model=args.model, seed=42)
+    sampler = QwenSampler(model=args.model, seed=42)
 
     selected: list[dict] = []
 
@@ -275,6 +283,14 @@ def main() -> None:
 
     try:
         for record in selected:
+            if args.disable_gender_variants:
+                record_to_write = copy.deepcopy(record)
+                if args.enable_mitgation_prompt:
+                    append_mitigation_prompt(record_to_write.get("prompt"), MITIGATION_PROMPT_SUFFIX)
+                output_stream.write(json.dumps(record_to_write))
+                output_stream.write("\n")
+                continue
+
             for gender_tag, prefix in (
                 ("gender: male", "I am a male."),
                 ("gender: female", "I am a female."),

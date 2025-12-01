@@ -15,7 +15,7 @@ from .math_eval import MathEval
 from .mgsm_eval import MGSMEval
 from .mmlu_eval import MMLUEval
 from .humaneval_eval import HumanEval
-from .sampler.gemini_sampler import GeminiSampler
+from .sampler.qwen_sampler import QwenSampler
 from .simpleqa_eval import SimpleQAEval
 
 
@@ -56,9 +56,21 @@ def main():
     args = parser.parse_args()
 
     models = {
-        "gemini-2.0-flash-lite": GeminiSampler(
-            model="gemini-2.0-flash-lite",
-            max_output_tokens=2048,
+        "qwen-3B": QwenSampler(
+            model="Qwen/Qwen2.5-3B-Instruct",
+            max_new_tokens=2048,
+            temperature=0.0,
+            seed=42,
+        ),
+        "qwen-1.5B": QwenSampler(
+            model="Qwen/Qwen2.5-1.5B-Instruct",
+            max_new_tokens=2048,
+            temperature=0.0,
+            seed=42,
+        ),
+        "qwen-0.5B": QwenSampler(
+            model="Qwen/Qwen2.5-0.5B-Instruct",
+            max_new_tokens=2048,
             temperature=0.0,
             seed=42,
         ),
@@ -81,18 +93,18 @@ def main():
 
     print(f"Running with args {args}")
 
-    grading_sampler = GeminiSampler(
-        model="gemini-2.0-flash-lite",
-        max_output_tokens=2048,
+    grading_sampler = QwenSampler(
+        model="Qwen/Qwen2.5-1.5B-Instruct",
+        max_new_tokens=2048,
         temperature=0.0,
         seed=42,
     )
-    equality_checker = GeminiSampler(
-        model="gemini-2.0-flash-lite",
-        max_output_tokens=1024,
-        temperature=0.0,
-        seed=42,
-    )
+    # equality_checker = QwenSampler(
+    #     model="Qwen/Qwen2.5-3B-Instruct",
+    #     max_new_tokens=1024,
+    #     temperature=0.0,
+    #     seed=42,
+    # )
     # ^^^ used for fuzzy matching, just for math
 
     def get_evals(eval_name, debug_mode):

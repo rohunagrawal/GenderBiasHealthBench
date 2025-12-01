@@ -4,3 +4,10 @@ pandas
 jinja2
 scipy
 blobfile
+torch
+transformers
+accelerate
+datasets
+peft
+trl
+wandb
