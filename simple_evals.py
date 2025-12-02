@@ -2,6 +2,7 @@ import argparse
 import json
 import subprocess
 from datetime import datetime
+from pathlib import Path
 
 import pandas as pd
 
@@ -45,12 +46,18 @@ def main():
     parser.add_argument(
         "--n-threads",
         type=int,
-        default=120,
+        default=1,
         help="Number of threads to run. Only supported for HealthBench and HealthBenchMeta.",
     )
     parser.add_argument("--debug", action="store_true", help="Run in debug mode")
     parser.add_argument(
         "--examples", type=int, help="Number of examples to use (overrides default)"
+    )
+    parser.add_argument(
+        "--model-path",
+        type=str,
+        default=None,
+        help="Path to a local Hugging Face checkpoint directory to load with QwenSampler.",
     )
 
     args = parser.parse_args()
@@ -76,6 +83,21 @@ def main():
         ),
         
     }
+
+    if args.model_path:
+        checkpoint_path = Path(args.model_path).expanduser()
+        checkpoint_dir = (
+            checkpoint_path.parent if checkpoint_path.is_file() else checkpoint_path
+        )
+        custom_model_key = checkpoint_dir.name or str(checkpoint_dir)
+        models = {
+            custom_model_key: QwenSampler(
+                model=str(checkpoint_dir),
+                max_new_tokens=2048,
+                temperature=0.0,
+                seed=42,
+            )
+        }
 
     if args.list_models:
         print("Available models:")

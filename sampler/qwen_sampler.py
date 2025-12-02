@@ -1,4 +1,5 @@
 import time
+from pathlib import Path
 from typing import Any
 
 import torch
@@ -14,7 +15,7 @@ class QwenSampler(SamplerBase):
 
     def __init__(
         self,
-        model: str = "Qwen/Qwen2.5-3B-Instruct",
+        model: str | Path = "Qwen/Qwen2.5-3B-Instruct",
         system_instruction: str | None = None,
         temperature: float = 0.2,
         top_p: float = 0.95,
@@ -36,7 +37,8 @@ class QwenSampler(SamplerBase):
             device: Device to run on ('cuda', 'cpu', or None for auto-detect)
             seed: Random seed for reproducibility
         """
-        self.model_name = model
+        model_path = Path(model)
+        self.model_name = str(model_path)
         self.system_instruction = system_instruction
         self.temperature = temperature
         self.top_p = top_p
@@ -50,12 +52,14 @@ class QwenSampler(SamplerBase):
         else:
             self.device = device
         
-        print(f"Loading Qwen model: {model} on {self.device}")
+        print(f"Loading Qwen model: {model_path} on {self.device}")
         
         # Load tokenizer and model
-        self.tokenizer = AutoTokenizer.from_pretrained(model, trust_remote_code=True)
+        self.tokenizer = AutoTokenizer.from_pretrained(
+            str(model_path), trust_remote_code=True
+        )
         self.model = AutoModelForCausalLM.from_pretrained(
-            model,
+            str(model_path),
             torch_dtype=torch.float16 if self.device == "cuda" else torch.float32,
             device_map=self.device if self.device == "cuda" else None,
             trust_remote_code=True,

@@ -207,7 +207,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--max-count",
         type=int,
-        default=10,
+        default=50,
         help="Stop after this many qualifying prompts (default: 10).",
     )
     parser.add_argument(

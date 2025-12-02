@@ -18,9 +18,9 @@ from peft import LoraConfig
 from transformers import AutoModelForCausalLM, AutoTokenizer
 from trl import GRPOConfig, GRPOTrainer
 
-from healthbench_eval import GENDER_COMPARISON_TEMPLATE, parse_json_to_dict
-from healthbench_dataset import HealthBenchDataset
-from sampler.qwen_sampler import QwenSampler
+from .healthbench_eval import GENDER_COMPARISON_TEMPLATE, parse_json_to_dict
+from .healthbench_dataset import HealthBenchDataset
+from .sampler.qwen_sampler import QwenSampler
 
 
 # Prompt prefix that instructs the model to answer the two gendered prompts and
@@ -235,10 +235,10 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--lora-dropout", type=float, default=0.05)
     parser.add_argument("--learning-rate", type=float, default=5e-5)
     parser.add_argument("--num-epochs", type=int, default=1)
-    parser.add_argument("--per-device-batch-size", type=int, default=2)
+    parser.add_argument("--per-device-batch-size", type=int, default=4)
     parser.add_argument("--mini-batch-size", type=int, default=1)
     parser.add_argument("--gradient-accumulation-steps", type=int, default=1)
-    parser.add_argument("--num-generations", type=int, default=2, help="Samples per prompt for GRPO")
+    parser.add_argument("--num-generations", type=int, default=4, help="Samples per prompt for GRPO")
     parser.add_argument("--max-prompt-length", type=int, default=2048)
     parser.add_argument("--max-completion-length", type=int, default=4096)
     return parser.parse_args()
